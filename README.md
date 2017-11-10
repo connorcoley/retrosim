@@ -4,7 +4,7 @@
 
 This repository contains the data and code needed to test a similarity-based approach to one-step retrosynthesis.
 
-Please note that ```rdchiral``` is a work-in-progress. We will continue development and hopefully release a new version in a public repo in the near future. The current version as of June 19, 2017 has been copied into this repository for result reproducibility.
+Please note that ```rdchiral``` is a work-in-progress. The current version as of June 19, 2017 has been copied into this repository for result reproducibility. An up-to-date version can be found at the public repo http://github.com/connorcoley/rdchiral
 
 ### data
 
