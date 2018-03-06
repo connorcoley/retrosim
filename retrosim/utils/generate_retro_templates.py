@@ -801,34 +801,34 @@ def process_an_example(reaction_smiles, super_general=False, v=False):
             if sum([a.HasProp('molAtomMapNumber') for a in product.GetAtoms()]) < len(product.GetAtoms()):
                 print('!!!! Not all product atoms have atom mapping')
                 print(reaction_smiles)
-                are_unmapped_product_atoms = True
-        if are_unmapped_product_atoms: # add fragment to template
-
-            total_partialmapped += 1
-            for product in products:
-                # Get unmapped atoms
-                unmapped_ids = [
-                    a.GetIdx() for a in product.GetAtoms() if not a.HasProp('molAtomMapNumber')
-                ]
-                if len(unmapped_ids) > MAXIMUM_NUMBER_UNMAPPED_PRODUCT_ATOMS:
-                    # Skip this example - too many unmapped!
-                    return
-                # Define new atom symbols for fragment with atom maps, generalizing fully
-                atom_symbols = ['[{}]'.format(a.GetSymbol()) for a in product.GetAtoms()]
-                # And bond symbols...
-                bond_symbols = ['~' for b in product.GetBonds()]
-                if unmapped_ids:
-                    extra_reactant_fragment += \
-                        AllChem.MolFragmentToSmiles(product, unmapped_ids, 
-                        allHsExplicit = False, isomericSmiles = USE_STEREOCHEMISTRY, 
-                        atomSymbols = atom_symbols, bondSymbols = bond_symbols) + '.'
-            if extra_reactant_fragment:
-                extra_reactant_fragment = extra_reactant_fragment[:-1]
-                if v: print('    extra reactant fragment: {}'.format(extra_reactant_fragment))
-
-            # Consolidate repeated fragments (stoichometry)
-            extra_reactant_fragment = '.'.join(sorted(list(set(extra_reactant_fragment.split('.')))))
-            #fragmatch = Chem.MolFromSmarts(extra_reactant_fragment) # no parentheses
+#                are_unmapped_product_atoms = True
+#        if are_unmapped_product_atoms: # add fragment to template
+#
+#            total_partialmapped += 1
+#            for product in products:
+#                # Get unmapped atoms
+#                unmapped_ids = [
+#                    a.GetIdx() for a in product.GetAtoms() if not a.HasProp('molAtomMapNumber')
+#                ]
+#                if len(unmapped_ids) > MAXIMUM_NUMBER_UNMAPPED_PRODUCT_ATOMS:
+#                    # Skip this example - too many unmapped!
+#                    return
+#                # Define new atom symbols for fragment with atom maps, generalizing fully
+#                atom_symbols = ['[{}]'.format(a.GetSymbol()) for a in product.GetAtoms()]
+#                # And bond symbols...
+#                bond_symbols = ['~' for b in product.GetBonds()]
+#                if unmapped_ids:
+#                    extra_reactant_fragment += \
+#                        AllChem.MolFragmentToSmiles(product, unmapped_ids, 
+#                        allHsExplicit = False, isomericSmiles = USE_STEREOCHEMISTRY, 
+#                        atomSymbols = atom_symbols, bondSymbols = bond_symbols) + '.'
+#            if extra_reactant_fragment:
+#                extra_reactant_fragment = extra_reactant_fragment[:-1]
+#                if v: print('    extra reactant fragment: {}'.format(extra_reactant_fragment))
+#
+#            # Consolidate repeated fragments (stoichometry)
+#            extra_reactant_fragment = '.'.join(sorted(list(set(extra_reactant_fragment.split('.')))))
+#            #fragmatch = Chem.MolFromSmarts(extra_reactant_fragment) # no parentheses
 
         ###
         ### Do RX-level processing
@@ -890,3 +890,12 @@ def process_an_example(reaction_smiles, super_general=False, v=False):
             print('skipping')
             #raw_input('Enter anything to continue')
         return
+
+if __name__ == '__main__': 
+    rxn_smarts = 'O=C(OCc1ccccc1)[NH:1][CH2:2][CH2:3][CH2:4][CH2:5][C@@H:6]([C:7]([O:8][CH3:9])=[O:10])[NH:11][C:12](=[O:13])[NH:14][c:15]1[cH:16][c:17]([O:18][CH3:19])[cH:20][c:21]([C:22]([CH3:23])([CH3:24])[CH3:25])[c:26]1[OH:27]>>[NH2:1][CH2:2][CH2:3][CH2:4][CH2:5][C@@H:6]([C:7]([O:8][CH3:9])=[O:10])[NH:11][C:12](=[O:13])[NH:14][c:15]1[cH:16][c:17]([O:18][CH3:19])[cH:20][c:21]([C:22]([CH3:23])([CH3:24])[CH3:25])[c:26]1[OH:27]'
+    from rdkit.Chem.Draw import IPythonConsole
+    IPythonConsole.ipython_useSVG=True 
+    print('Before process_an_example(reactionSmartsString):')
+    display(Chem.AllChem.ReactionFromSmarts(rxn_smarts)) 
+    print('After process_an_example(reactionSmartsString):')
+    display(Chem.AllChem.ReactionFromSmarts(process_an_example(rxn_smarts)))    
