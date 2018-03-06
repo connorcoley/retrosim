@@ -1,3 +1,9 @@
+
+# coding: utf-8
+
+# In[8]:
+
+
 import rdkit.Chem as Chem
 import rdkit.Chem.AllChem as AllChem
 import rdkit.Chem.Draw as Draw
@@ -94,10 +100,11 @@ def TrimImgByWhite(img, padding=0):
     as_array = np.array(img)  # N x N x (r,g,b,a)
 
     # Set previously-transparent pixels to white
-    as_array[as_array[:, :, 3] == 0] = [255, 255, 255, 255]
+    #as_array[as_array[:, :, 3] == 0] = [255, 255, 255, 255] # img is not RGBA any more
 
     # Content defined as non-white and non-transparent pixel
-    has_content = np.sum(as_array, axis=2, dtype=np.uint32) != 255 * 4
+    #has_content = np.sum(as_array, axis=2, dtype=np.uint32) != 255 * 4 
+    has_content = np.sum(as_array, axis=2, dtype=np.uint32) != 255 * 3 # Alpha Channel is gone 
     xs, ys = np.nonzero(has_content)
 
     # Crop down
@@ -108,7 +115,7 @@ def TrimImgByWhite(img, padding=0):
 
     img = Image.fromarray(as_array_cropped, mode='RGB')
 
-    return ImageOps.expand(img, border=padding, fill=(255, 255, 255, 0))
+    return ImageOps.expand(img, border=padding, fill=(255, 255, 255))
 
 
 def StitchPILsHorizontally(imgs):
@@ -121,12 +128,13 @@ def StitchPILsHorizontally(imgs):
     height = max(heights)
     widths = [img.size[0] for img in imgs]
     width = sum(widths)
-    res = Image.new('RGBA', (width, height), (255, 255, 255, 255))
+    res = Image.new('RGB', (width, height), (255, 255, 255))
 
     # Add in sub-images
     for i, img in enumerate(imgs):
         offset_x = sum(widths[:i])  # left to right
-        offset_y = (height - heights[i]) / 2
+        #offset_y = (height - heights[i]) / 2
+        offset_y = (height - heights[i]) // 2
         res.paste(img, (offset_x, offset_y))
 
     return res
@@ -163,7 +171,7 @@ def CheckAtomForGeneralization(atom):
         atom.ClearProp('molAtomMapNumber')
 
 
-def ReactionToImage(rxn, dummyAtoms=False, kekulize=True, options=None, **kwargs):
+def ReactionToImage(rxn, dummyAtoms=False, kekulize=False, options=None, **kwargs):
     '''Modification of RDKit's ReactionToImage to allow for each molecule 
     to have a different drawn size. rxn is an RDKit reaction object
 
@@ -193,8 +201,7 @@ def ReactionToImage(rxn, dummyAtoms=False, kekulize=True, options=None, **kwargs
     return StitchPILsHorizontally(imgs)
 
 
-def ReactionStringToImage(rxn_string, strip=True, update=True, options=None,
-		retro=False, **kwargs):
+def ReactionStringToImage(rxn_string, strip=True, update=True, options=None, retro=False, **kwargs):
     '''This function takes a SMILES rxn_string as input, not an 
     RDKit reaction object, and draws it.'''
 
@@ -206,9 +213,9 @@ def ReactionStringToImage(rxn_string, strip=True, update=True, options=None,
 
     # Stich together mols (ignore agents)
     if retro:
-    	mols = reactants + ['<-'] + products
+        mols = reactants + ['<-'] + products
     else:
-		mols = reactants + ['->'] + products
+        mols = reactants + ['->'] + products
     if update:
         [mol.UpdatePropertyCache(False) for mol in mols if mol is not None and type(mol) != str]
     if strip:
@@ -257,15 +264,16 @@ def MolsSmilesToImage(smiles, options=None, **kwargs):
     return StitchPILsHorizontally(imgs)
 
 
-if __name__ == '__main__':
-
+if __name__ == '__main__': 
     # Simple test cases
     rxn_string = '[Na+].[CH3:2][C:3](=[O:5])[O-].[CH3:6][c:7]1[cH:12][cH:11][cH:10][cH:9][cH:8]1>>CN3[C@H]1CC[C@@H]3C[C@@H](C1)OC(=O)C(CO)c2ccccc2.[c:7]1([CH3:6])[c:12]([C:3]([c:2]2[cH:11][cH:12][cH:7][cH:8][c:9]2[CH3:10])=[O:5])[cH:11][cH:10][cH:9][cH:8]1'
     rxn = AllChem.ReactionFromSmarts(rxn_string)
     rxn_image = ReactionToImage(rxn)
+    rxn_image
     rxn_image.save('test_rxn.png')
     rxn_image_string = ReactionStringToImage(rxn_string, strip=True)
     rxn_image_string.save('test_rxn_string.png')
     tform = '([O;H0:3]=[C;H0:4](-[C:5])-[NH:2]-[C:1])>>([C:1]-[NH2:2]).([OH:3]-[C;H0:4](=O)-[C:5])'
     img = TransformStringToImage(tform)
-    img.save('transform.png')
+    img.save('transform.png') 
+
