@@ -21,3 +21,13 @@ The notebook ```process_results``` reads from ```results.txt``` and examines the
 ### contact
 
 For any questions, feel free to email ccoley@mit.edu
+
+
+### Comments From xg590@nyu.edu
+The following ipynb is for demonstration
+retrosim/retrosim/scripts/extract_templates.ipynb # Read from data/data_processed.csv and write to data/templates_general.json
+retrosim/retrosim/scripts/analyze_templates.ipynb # Read from data/templates_general.json
+
+retrosim/retrosim/scripts/proc_data.ipynb # Read from data/from_schneider/dataSetB.csv and write to data/data_processed.csv
+retrosim/retrosim/scripts/get_test_examples.ipynb # Read from data/data_processed.csv and apply retrosim method on an exemplary reaction
+retrosim/retrosim/scripts/test_similarity.ipynb # Apply retrosim method on each reaction within the test set

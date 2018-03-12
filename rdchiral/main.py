@@ -6,6 +6,7 @@ import rdkit.Chem as Chem
 import rdkit.Chem.AllChem as AllChem
 from rdkit.Chem.rdchem import ChiralType, BondType, BondDir
 
+sys.path.append('../')
 from rdchiral.utils import vprint
 from rdchiral.initialization import rdchiralReaction, rdchiralReactants
 from rdchiral.chiral import template_atom_could_have_been_tetra, copy_chirality, atom_chirality_matches
@@ -79,7 +80,7 @@ def rdchiralRun(rxn, reactants, keep_isotopes=False, combine_enantiomers=True):
         # Set isotopes of reactant template
         # note: this is okay to do within the loop, because ALL atoms must be matched
         # in the templates, so the isotopes will get overwritten every time
-        [a.SetIsotope(i) for (i, a) in atoms_rt.iteritems()]
+        [a.SetIsotope(i) for (i, a) in atoms_rt.items()]
 
         # Make sure each atom matches
         if not all(atom_chirality_matches(atoms_rt[i], atoms_r[i]) for i in atoms_rt):
@@ -151,7 +152,8 @@ def rdchiralRun(rxn, reactants, keep_isotopes=False, combine_enantiomers=True):
         # note: this is okay to do within the loop, because ALL atoms must be matched
         # in the templates, so the isotopes will get overwritten every time
         # This makes it easier to check parity changes
-        [a.SetIsotope(i) for (i, a) in atoms_pt.iteritems()]
+        #[a.SetIsotope(i) for (i, a) in atoms_pt.iteritems()]
+        [a.SetIsotope(i) for (i, a) in atoms_pt.items()]
         ###############################################################################
 
 
@@ -299,7 +301,7 @@ def rdchiralRun(rxn, reactants, keep_isotopes=False, combine_enantiomers=True):
 
 
 if __name__ == '__main__':
-    reaction_smarts = '[C:1][OH:2]>>[C:1][O:2][C]'
+    reaction_smarts = '[C:1][OH:2]>>[C:1][O:2][Cl]'
     reactant_smiles = 'CC(=O)OCCCO'
     outcomes = rdchiralRunText(reaction_smarts, reactant_smiles)
     print(outcomes)
